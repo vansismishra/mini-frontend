@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        .body{
+            transition: all .2s linear;
+            background-color: honeydew;
+        }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .modal input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #0056b3;
+        }
+      #container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+      }
+      .card-body-img {
+        width: 70%;
+        height: 50%;
+        margin: auto;
+        display: block;
+        padding: 2px;
+        top: 15%;
+        filter: drop-shadow(12px 12px 18px black);
+      }
+      .card-body-img:hover{
+        width: 80%;
+        height: 60%;
+      }
+      .card-body-title {
+       
+        text-align: center;
+        font-size: 3rem;
+        padding: 4px;
+      }
+      .card-body-text {
+        margin: 0;
+        text-align: center;
+        font-size: 1.8rem;
+        padding: 4px;
+      }
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .card-footer-social {
+        font-size: 1.3rem;
+        padding: 4px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <h2>Enter Country</h2>
+            <input type="text" id="countryInput" placeholder="Country Name">
+            <button id="countrySubmit">Submit</button>
+        </div>
+    </div>
+    <div id="container"></div>
+    <script>
+      const container = document.querySelector(`#container`);
+      const nameModal = document.getElementById('nameModal');
+      const countryInput = document.getElementById('countryInput');
+      const countrySubmitButton = document.getElementById('countrySubmit');
+
+      // Function to open the modal
+      function openModal() {
+            nameModal.style.display = 'block';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            nameModal.style.display = 'none';
+        }
+
+        // Open the modal when the page loads
+        openModal();
+
+        // Event listener for the submit button
+        countrySubmitButton.addEventListener('click', () => {
+            const countryName = countryInput.value.trim();
+            if (countryName) {
+                // Construct the API URL based on the entered country name
+                const apiUrl = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}`;
+                const request = new XMLHttpRequest();
+                request.open("GET", apiUrl);
+                request.send();
+      //To get the response
+      request.addEventListener("load", function () {
+        // console.log(this.responseText);
+        const [data] = JSON.parse(this.responseText);
+        // console.log(data.capital);
+        console.log("Before inserting htmlData:", container.innerHTML);
+
+        const htmlData = ` 
+              <div id="card">
+            <article class="card">
+                <div class="card-body">
+                    <img src="${data.flags.png}" alt="card-body-image" srcset="" class="card-body-img">
+                    <h1 class="card-body-title">
+                        ${data.name.common} <span></span>
+                    </h1>
+                    <p class="card-body-text"> capital : ${data.capital}</p>
+                </div>
+                <div class="card-footer">
+                    <div class="card-footer-social">
+                        <h3>${data.population}</h3>
+                        <p>Population</p>
+                    </div>
+                    <div class="card-footer-social">
+                        <h3>${data.demonyms.eng.f}</h3>
+                        <p>Demonym</p>
+                    </div>
+                </div>
+            </article>
+          </div>
+               `;
+
+        container.insertAdjacentHTML("afterbegin", htmlData);
+        console.log("After inserting htmlData:", container.innerHTML);
+        closeModal(); // Close the modal after submission
+      });
+    }
+});
+
+// Event listener for Enter key press in the input field
+countryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            countrySubmitButton.click(); // Simulate a click on the submit button
+        }
+});
+    </script>
+  </body>
+</html>
